@@ -15,14 +15,17 @@ class _CreateChannelState extends State<CreateChannel> {
 
   createBtnCtrl(BuildContext context) {
     final String inputString = textEditingController.text.trim().toString();
+
     if (inputString.isNotEmpty) {
-      const SnackBar(content: Text("abcd"),);
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const CreateQR())
+        MaterialPageRoute(builder: (context) => CreateQR(
+          contentDataBase: inputString,
+        ))
       );
     } else {
-      _warnString = "Please Fill the Text";
-      const SnackBar(content: Text("dcba"),);
+      setState(() {
+        _warnString = "Please Fill the Text";
+      });
     }
   }
 
@@ -32,7 +35,13 @@ class _CreateChannelState extends State<CreateChannel> {
       appBar: onlyBackBar(context),
 
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: (MediaQuery.of(context).size.width > 750) ?
+          const EdgeInsets.symmetric(
+            horizontal: 480,
+            vertical: 24.0
+          )
+          : const EdgeInsets.all(24.0),
+
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -62,7 +71,7 @@ class _CreateChannelState extends State<CreateChannel> {
                       enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.all(Radius.circular(0)),
                           borderSide: BorderSide(
-                          width: 1.0,
+                          width: 2.0,
                           color: Colors.white
                         )
                       ),
@@ -70,7 +79,7 @@ class _CreateChannelState extends State<CreateChannel> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(0)),
                         borderSide: BorderSide(
-                          width: 1.0,
+                          width: 2.0,
                           color: Colors.white
                         )
                       ),
@@ -97,7 +106,9 @@ class _CreateChannelState extends State<CreateChannel> {
                 width: 120,
 
                 child: ElevatedButton(
-                  onPressed: () => createBtnCtrl(context),
+                  onPressed: () {
+                    createBtnCtrl(context);
+                  },
 
                   style: const ButtonStyle(
                     backgroundColor: MaterialStatePropertyAll(

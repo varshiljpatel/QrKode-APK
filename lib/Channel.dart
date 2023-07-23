@@ -38,14 +38,18 @@ class _ChannelState extends State<Channel> {
               onTap: () {
                 scanChannel();
               },
-              
+
               customBorder: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(1000))
               ),
-              
+
               child: Container(
-                height: MediaQuery.of(context).size.width / 2.25,
-                width: MediaQuery.of(context).size.width / 2.25,
+                height: (MediaQuery.of(context).size.width > 750) ?
+                  MediaQuery.of(context).size.width / 8
+                  : MediaQuery.of(context).size.width / 2.25,
+                width: (MediaQuery.of(context).size.width > 750) ?
+                  MediaQuery.of(context).size.width / 3
+                  : MediaQuery.of(context).size.width / 2.25,
 
                 decoration: BoxDecoration(
                   border: Border.all(width: 4.0, color: Colors.white),
@@ -76,8 +80,12 @@ class _ChannelState extends State<Channel> {
               ),
 
               child: Container(
-                height: MediaQuery.of(context).size.width / 2.25,
-                width: MediaQuery.of(context).size.width / 2.25,
+                height: (MediaQuery.of(context).size.width > 750) ?
+                  MediaQuery.of(context).size.width / 8
+                  : MediaQuery.of(context).size.width / 2.25,
+                width: (MediaQuery.of(context).size.width > 750) ?
+                  MediaQuery.of(context).size.width / 3
+                  : MediaQuery.of(context).size.width / 2.25,
 
                 decoration: BoxDecoration(
                     border: Border.all(width: 4.0, color: Colors.white),
