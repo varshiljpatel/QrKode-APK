@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_kode/constants.dart';
 import 'ScanChannel.dart';
 import 'CreateChannel.dart';
 
@@ -27,6 +29,16 @@ class _ChannelState extends State<Channel> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(0),
+        child: AppBar(
+          systemOverlayStyle: const SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.black,
+            statusBarColor: Colors.black
+          ),
+          backgroundColor: Colors.transparent,
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,20 +58,20 @@ class _ChannelState extends State<Channel> {
               child: Container(
                 height: (MediaQuery.of(context).size.width > 750) ?
                   MediaQuery.of(context).size.width / 8
-                  : MediaQuery.of(context).size.width / 2.25,
+                  : MediaQuery.of(context).size.width / 2,
                 width: (MediaQuery.of(context).size.width > 750) ?
                   MediaQuery.of(context).size.width / 3
-                  : MediaQuery.of(context).size.width / 2.25,
+                  : MediaQuery.of(context).size.width / 2,
 
                 decoration: BoxDecoration(
                   border: Border.all(width: 4.0, color: Colors.white),
                   borderRadius: const BorderRadius.all(Radius.circular(1000))
                 ),
 
-                child: const Center(
+                child: Center(
                   child: Text("Scan", style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 32
+                    fontSize: Constants.BIGTEXT.toDouble()
                   ),),
                 ),
               ),
@@ -80,22 +92,22 @@ class _ChannelState extends State<Channel> {
               ),
 
               child: Container(
-                height: (MediaQuery.of(context).size.width > 750) ?
-                  MediaQuery.of(context).size.width / 8
-                  : MediaQuery.of(context).size.width / 2.25,
-                width: (MediaQuery.of(context).size.width > 750) ?
-                  MediaQuery.of(context).size.width / 3
-                  : MediaQuery.of(context).size.width / 2.25,
+                height: (Constants.FULLWIDTH(context) > 750) ?
+                  Constants.FULLWIDTH(context) / 8
+                  : Constants.FULLWIDTH(context) / 2,
+                width: (Constants.FULLWIDTH(context) > 750) ?
+                  Constants.FULLWIDTH(context) / 3
+                  : Constants.FULLWIDTH(context) / 2,
 
                 decoration: BoxDecoration(
                     border: Border.all(width: 4.0, color: Colors.white),
                     borderRadius: const BorderRadius.all(Radius.circular(1000))
                 ),
 
-                child: const Center(
+                child: Center(
                   child: Text("Create", style: TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 32,
+                      fontSize: Constants.BIGTEXT.toDouble(),
                   ),),
                 ),
               ),

@@ -1,8 +1,15 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_kode/code_painter.dart';
+import 'package:qr_kode/constants.dart';
 import 'package:qr_kode/ui/appbar.dart';
+import 'package:qr_kode/ui/snakeBar.dart';
+import 'package:share/share.dart';
+import 'dart:ui' as ui;
 
 class CreateQR extends StatefulWidget {
   final String contentDataBase;
@@ -39,75 +46,79 @@ class _CreateQRState extends State<CreateQR> {
 
   // Share QR Code
   void _shareQrCode() async {
-    // if (_contentData.isEmpty) return;
-    // try {
-    //   final imageQr = await QrPainter(
-    //     data: _contentData,
-    //     version: QrVersions.auto,
-    //     color: Colors.black,
-    //     emptyColor: Colors.white,
-    //     gapless: true
-    //   ).toImageData(300);
-    //
-    //   // final byteData = await imageQr.toByteData(
-    //   //   format: ImageByteFormat.png
-    //   // )
-    //
-    //   await Share.shareXFiles(
-    //     [imageQr!.],
-    //     text: "Share this QR via",
-    //     subject: "QR Kode"
-    //   );
-    // }
-
-    // final directory = (await getApplicationDocumentsDirectory()).path;
-    // screenshotController.capture().then((dynamic image) async {
-    //   if (image != null) {
-    //     try {
-    //       String filename = DateTime.now().microsecondsSinceEpoch.toString();
-    //       final imagePath = await File("$directory/$filename.png").create();
-    //       await imagePath.writeAsBytes(image);
-    //       Share.shareFiles([imagePath.path]);
-    //     } catch (e) {}
-    //   }
-    // });
+    if (_contentData.isEmpty) return;
+    try {
+      _generateQrCode();
+      var filePathSave = await _downloadQrCode();
+      await Share.shareFiles(["$filePathSave"]);
+    } catch (e) {
+      if (kDebugMode) {
+        print("Eoo Occ");
+      }
+    }
   }
 
   // Share QR Code
   Future<String?>? _downloadQrCode() async {
     try {
       Directory? directory = await getExternalStorageDirectory();
-      String filename = "QrKode-${DateTime.now().millisecondsSinceEpoch}.png".toString();
-      File file = File("${directory?.path}/$filename");
-      await file.writeAsBytes(await _generateQrCodeBytes(_contentData));
-      // print("Saved");
+
+      // Create QrKode Directory
+      List<String?>? downloadDirList = [];
+      var dirList = directory.toString().split("/");
+      try {
+        for (int i = 0; i < dirList.length; i++) {
+          if (dirList[i].toString().toLowerCase() == "android") {
+            break;
+          }
+          downloadDirList.add(dirList[i]);
+        }
+        directory = Directory("${downloadDirList.join("/")}/QrKode");
+      } catch (e) {
+        if (kDebugMode) {
+          print("Error : $e");
+        }
+        showSnakeBar(context: context, message: "Failed to download.");
+      }
+
+      String filename = "QrKode-${DateTime.now().millisecondsSinceEpoch}.png";
+      File file = File("${directory!.path}/$filename");
+      file.create();
+      Uint8List? qrCodeBytes = await _generateQrCodeBytes(_contentData);
+      ImageGallerySaver.saveImage(qrCodeBytes!);
+      await file.writeAsBytes(qrCodeBytes);
       widget._scaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(content: Text("QR code saved to: ${file.path}")),
       );
-      print(file);
-      print(file.path);
       return file.path;
     } catch (e) {
-      print("e :: $e");
+      if (kDebugMode) {
+        print("Error : $e");
+      }
+      widget._scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text("Fail to save QR code.")),
+      );
     }
     return null;
   }
 
-  _generateQrCodeBytes(String data) async {
+  Future<Uint8List?>? _generateQrCodeBytes(String data) async {
     try {
-      final qrImage = await QrPainter(
+       var qrImage = await QrPainter(
         data: data,
         version: QrVersions.auto,
         color: Colors.black,
         emptyColor: Colors.white,
         gapless: true,
-      ).toImageData(300);
+      ).toImageData(1000);
 
       return qrImage?.buffer.asUint8List();
     } catch (e) {
-      print("Error generating QR code: $e");
-      return [];
+      widget._scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(content: Text("Fail to save QR code.")),
+      );
     }
+    return null;
   }
 
   @override
@@ -122,8 +133,8 @@ class _CreateQRState extends State<CreateQR> {
               mainAxisAlignment: MainAxisAlignment.center,
 
               children: [
-                const Text("Download", style: TextStyle(
-                  fontSize: 32.0,
+                Text("Download", style: TextStyle(
+                  fontSize: Constants.BIGTEXT.toDouble(),
                   fontWeight: FontWeight.w500
                 ),),
 
@@ -143,8 +154,8 @@ class _CreateQRState extends State<CreateQR> {
                     maxWidth: 225
                   ),
 
-                  child: const Text('Scan this QR Code for get your text or link.', textAlign: TextAlign.center, style: TextStyle(
-                    fontSize: 16.0,
+                  child: Text('Scan this QR Code for get your text or link.', textAlign: TextAlign.center, style: TextStyle(
+                    fontSize: Constants.TEXT.toDouble(),
                     fontWeight: FontWeight.w400,
                   ),),
                 ),
@@ -189,13 +200,9 @@ class _CreateQRState extends State<CreateQR> {
                       // Download icon
                       InkWell(
                         onTap: () async {
-                          String? filePath = await _downloadQrCode();
-                          SnackBar snackBar = SnackBar(
-                            content: Text("QR code saved to: $filePath"),
-                          );
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          await _downloadQrCode();
                         },
-                        
+
                         customBorder: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(1000))
                         ),

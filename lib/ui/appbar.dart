@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 PreferredSizeWidget? onlyBackBar(BuildContext context) {
   return AppBar(
@@ -7,6 +8,10 @@ PreferredSizeWidget? onlyBackBar(BuildContext context) {
     leading: IconButton(
         onPressed: () => Navigator.of(context).pop(),
         icon: const Icon(Icons.arrow_back_sharp, color: Colors.white)
+    ),
+    systemOverlayStyle: const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.black,
+      statusBarColor: Colors.black,
     ),
   );
 }

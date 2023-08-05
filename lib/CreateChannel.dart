@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_kode/CreateQR.dart';
+import 'package:qr_kode/constants.dart';
 import 'package:qr_kode/ui/appbar.dart';
 
 class CreateChannel extends StatefulWidget {
@@ -47,9 +48,9 @@ class _CreateChannelState extends State<CreateChannel> {
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: [
-              const Text('Create QR', style: TextStyle(
+              Text('Create QR', style: TextStyle(
                 fontWeight: FontWeight.w500,
-                fontSize: 32.0
+                fontSize: Constants.BIGTEXT.toDouble()
               ),),
 
               const SizedBox(
@@ -90,10 +91,10 @@ class _CreateChannelState extends State<CreateChannel> {
                     height: 12.0,
                   ),
 
-                  Text(_warnString.toString(), style: const TextStyle(
+                  Text(_warnString.toString(), style: TextStyle(
                     fontWeight: FontWeight.w400,
                     color: Colors.white60,
-                    fontSize: 16.0
+                    fontSize: Constants.TEXT.toDouble()
                   ),),
                 ],
               ),
