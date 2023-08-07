@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_kode/Channel.dart';
-import 'package:qr_kode/constants.dart';
+import 'package:qr_kode/screens/Channel.dart';
+import 'package:qr_kode/utils/constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

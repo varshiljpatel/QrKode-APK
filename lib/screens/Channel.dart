@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:qr_kode/constants.dart';
+import 'package:qr_kode/utils/constants.dart';
 import 'ScanChannel.dart';
 import 'CreateChannel.dart';
 

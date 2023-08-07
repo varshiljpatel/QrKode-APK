@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'SplashScreen.dart';
+import 'screens/SplashScreen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

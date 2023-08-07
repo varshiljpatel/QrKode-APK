@@ -3,9 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:qr_kode/code_painter.dart';
-import 'package:qr_kode/constants.dart';
+import 'package:qr_kode/utils/code_painter.dart';
+import 'package:qr_kode/utils/constants.dart';
 import 'package:qr_kode/ui/appbar.dart';
 import 'package:qr_kode/ui/snakeBar.dart';
 import 'package:share/share.dart';
@@ -60,44 +61,54 @@ class _CreateQRState extends State<CreateQR> {
 
   // Share QR Code
   Future<String?>? _downloadQrCode() async {
-    try {
-      Directory? directory = await getExternalStorageDirectory();
-
-      // Create QrKode Directory
-      List<String?>? downloadDirList = [];
-      var dirList = directory.toString().split("/");
+    if (Platform.isAndroid) {
       try {
-        for (int i = 0; i < dirList.length; i++) {
-          if (dirList[i].toString().toLowerCase() == "android") {
-            break;
+        if (await Permission.manageExternalStorage.isGranted) {
+          Directory? directory = await getExternalStorageDirectory();
+
+          // Create QrKode Directory
+          List<String?>? downloadDirList = [];
+          var dirList = directory.toString().split("/");
+          try {
+            for (int i = 0; i < dirList.length; i++) {
+              if (dirList[i].toString().toLowerCase() == "android") {
+                break;
+              }
+              downloadDirList.add(dirList[i]);
+            }
+            directory = Directory("${downloadDirList.join("/")}/QrKode");
+
+            // Create directory
+            if (!await directory.exists()) {
+              directory.create(recursive: true);
+            }
+          } catch (e) {
+            if (kDebugMode) {
+              print("Error : $e");
+            }
+            showSnakeBar(context: context, message: "Failed to download.");
           }
-          downloadDirList.add(dirList[i]);
+
+          String filename = "QrKode-${DateTime.now().millisecondsSinceEpoch}.png";
+          File file = File("${directory!.path}/$filename");
+          file.create();
+          Uint8List? qrCodeBytes = await _generateQrCodeBytes(_contentData);
+
+          ImageGallerySaver.saveImage(qrCodeBytes!);
+          await file.writeAsBytes(qrCodeBytes);
+          widget._scaffoldMessengerKey.currentState?.showSnackBar(
+            SnackBar(content: Text("QR code saved to: ${file.path}")),
+          );
+          return file.path;
         }
-        directory = Directory("${downloadDirList.join("/")}/QrKode");
       } catch (e) {
         if (kDebugMode) {
           print("Error : $e");
         }
-        showSnakeBar(context: context, message: "Failed to download.");
+        widget._scaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text("Fail to save QR code.")),
+        );
       }
-
-      String filename = "QrKode-${DateTime.now().millisecondsSinceEpoch}.png";
-      File file = File("${directory!.path}/$filename");
-      file.create();
-      Uint8List? qrCodeBytes = await _generateQrCodeBytes(_contentData);
-      ImageGallerySaver.saveImage(qrCodeBytes!);
-      await file.writeAsBytes(qrCodeBytes);
-      widget._scaffoldMessengerKey.currentState?.showSnackBar(
-        SnackBar(content: Text("QR code saved to: ${file.path}")),
-      );
-      return file.path;
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error : $e");
-      }
-      widget._scaffoldMessengerKey.currentState?.showSnackBar(
-        const SnackBar(content: Text("Fail to save QR code.")),
-      );
     }
     return null;
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qr_kode/CreateQR.dart';
-import 'package:qr_kode/constants.dart';
+import 'package:qr_kode/screens/CreateQR.dart';
+import 'package:qr_kode/utils/constants.dart';
 import 'package:qr_kode/ui/appbar.dart';
 
 class CreateChannel extends StatefulWidget {
